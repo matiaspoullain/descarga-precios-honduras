@@ -2,6 +2,9 @@ import requests
 import os
 from datetime import datetime
 from lxml import html
+import pandas as pd
+from pandas.api.types import is_numeric_dtype
+import numpy as np
 
 # Diccionario de numero de mes a diccionario:
 dict_calendario = {1: "Enero",
@@ -63,4 +66,60 @@ def get_pdfs_urls_from_url(single_url):
     return(pdfs_urls)
 
 
+def clean_glued_columns(df, columnas_num, columnas, bad_substring = ' '):
+    for columna_num in columnas_num:
+        if is_numeric_dtype(df[columna_num]):
+            continue
+        tiene_errores = df[columna_num].str.contains(bad_substring).values.tolist()
+        tiene_errores = [lugar == True for lugar in tiene_errores]
+        if sum(tiene_errores) > 0:
+            indices_errores = np.where(tiene_errores)[0].tolist()
+            for indice_error in indices_errores:
+                indice_columna = columnas.index(columna_num)
+                valor_mal = df.iloc[indice_error, indice_columna]
+                valor_mal = ' '.join(valor_mal.split(bad_substring))
+                valores_bien = valor_mal.split()
+                for salto, nuevo_valor in enumerate(valores_bien):
+                    df.iloc[indice_error, indice_columna + salto] = nuevo_valor
+    return df
+
+def clean_table(df, last_columns_n = 0):
+    if (len(df.columns) == 1) & (last_columns_n > 0):
+        df = df.loc[:, 0].str.split('\n', last_columns_n - 1, expand=True)
+    #Nombres de columnas
+    primera_linea = df.iloc[0, :].values.tolist()
+    if 'Precios' not in primera_linea:
+        return df
+    indice_precios = primera_linea.index('Precios')
+    if indice_precios == 0:
+        columnas_char = ['Producto', 'Origen', 'Tamaño', 'Unidad de Venta']
+    else:
+        columnas_char = primera_linea[0:indice_precios]
+    columnas_num = ['Precios_Rango_Bajo_Lempira', 'Precios_Rango_Alto_Lempira', 'Precios_RangoModa_Bajo_Lempira', 'Precios_RangoModa_Alto_Lempira']
+    columnas = columnas_char + columnas_num
+
+    #Remove first rows 
+    df = df.iloc[4:, :].reset_index(drop = True)
+    if len(df.columns) <= 6:
+        n_new_cols = len(columnas) - len(df.columns)
+        for i in range(n_new_cols):
+            df[f'nueva_{i}'] = ''
+
+    df.columns = columnas
+
+    #Check if a numeric columns has spaces
+    bad_substrings = ['\n ', ' ']
+    for bad_substring in bad_substrings:
+        df = clean_glued_columns(df, columnas_num, columnas, bad_substring = bad_substring)
+
+    #Clean numeric columns:
+    for columna in columnas_num:
+        df[columna] = df[columna].astype(str)
+        df.loc[:,columna] = pd.to_numeric(df.loc[:,columna].map(lambda x: x.replace(',', '').replace('None', '')))
+
+    #Clean cheracter columns:
+    for columna in columnas_char:
+        df.loc[:,columna] = df.loc[:,columna].map(lambda x: x.replace('\n', '').replace('None', ''))
+    
+    return df
 
