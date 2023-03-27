@@ -32,12 +32,12 @@ def get_current_year_month():
 def get_main_url(current_year):
     return f'http://historicos.simpah.hn/reportes_varios/index.php?dir=Reportes%20SIMPAH%20-%20{current_year}'
 
-def get_local_directory_path(dict_reportes):
+def get_local_directory_path(dict_reportes, month = datetime.now().month, year = datetime.now().year):
     lista_directorios = []
-
+    fecha_lab = f'{year}-{str(month).zfill(2)}'
     for reporte in dict_reportes:
         for tipo in dict_reportes[reporte]:
-            lista_directorios.append(os.path.join('data', 'pdfs', reporte, tipo))
+            lista_directorios.append(os.path.join('data', 'pdfs', fecha_lab, reporte, tipo))
     
     return lista_directorios
 
@@ -88,24 +88,34 @@ def clean_table(df, last_columns_n = 0):
         df = df.loc[:, 0].str.split('\n', last_columns_n - 1, expand=True)
     #Nombres de columnas
     primera_linea = df.iloc[0, :].values.tolist()
-    if 'Precios' not in primera_linea:
-        return df
-    indice_precios = primera_linea.index('Precios')
-    if indice_precios == 0:
+
+    if last_columns_n == 8:
+        columnas_char = ['Producto', 'Origen', 'Tamaño', 'Unidad de Venta']
+    elif last_columns_n == 7:
         columnas_char = ['Producto', 'Origen', 'Tamaño', 'Unidad de Venta']
     else:
-        columnas_char = primera_linea[0:indice_precios]
+        indice_precios = primera_linea.index('Precios')
+        if indice_precios == 0:
+            columnas_char = ['Producto', 'Origen', 'Tamaño', 'Unidad de Venta']
+        else:
+            columnas_char = primera_linea[0:indice_precios]
+    
     columnas_num = ['Precios_Rango_Bajo_Lempira', 'Precios_Rango_Alto_Lempira', 'Precios_RangoModa_Bajo_Lempira', 'Precios_RangoModa_Alto_Lempira']
     columnas = columnas_char + columnas_num
 
+
     #Remove first rows 
-    df = df.iloc[4:, :].reset_index(drop = True)
-    if len(df.columns) <= 6:
-        n_new_cols = len(columnas) - len(df.columns)
-        for i in range(n_new_cols):
-            df[f'nueva_{i}'] = ''
+    if 'Precios' in primera_linea:
+        df = df.iloc[4:, :].reset_index(drop = True)
+        if len(df.columns) <= 6:
+            n_new_cols = len(columnas) - len(df.columns)
+            for i in range(n_new_cols):
+                df[f'nueva_{i}'] = ''
 
     df.columns = columnas
+
+    if 'Precios' not in primera_linea:
+        return df    
 
     #Check if a numeric columns has spaces
     bad_substrings = ['\n ', ' ']
@@ -123,3 +133,8 @@ def clean_table(df, last_columns_n = 0):
     
     return df
 
+
+def get_last_n_basedir(path, n):
+    for _ in range(n):
+        path = os.path.dirname(path)
+    return os.path.basename(path)
