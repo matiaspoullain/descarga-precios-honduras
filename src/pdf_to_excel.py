@@ -11,6 +11,8 @@ import pandas as pd
 from lxml import html
 from tqdm import tqdm
 
+print('Inicio extracción de tablas de PDFs y su guardado como xlsx...')
+
 current_year, current_month_number, current_month_nombre, joined_current_year_month = get_current_year_month()
 fecha_lab = f'{current_year}-{str(current_month_number).zfill(2)}'
 main_folder = os.path.join('data', 'pdfs', fecha_lab)
@@ -40,6 +42,6 @@ for pdf_file in tqdm(pdfs_files):
     #Save df as excel
     df.to_excel(excel_file, index=False)
 
-
+print('Tablas guardadas como xlsx...')
 
 

@@ -3,6 +3,8 @@ from src.diccionario_reportes import dict_reportes
 from tqdm import tqdm
 import urllib.parse
 
+print('Inicio de descarga de PDFs...')
+
 current_year, current_month_number, current_month_nombre, joined_current_year_month = get_current_year_month()
 
 main_url = get_main_url(current_year)
@@ -23,3 +25,5 @@ for directorio in tqdm(dict_links_pdfs):
             continue
         r = requests.get(pdf_url, allow_redirects=True)
         open(path_archivo, 'wb').write(r.content)
+
+print('Descarga PDFs completas...')

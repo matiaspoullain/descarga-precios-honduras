@@ -8,7 +8,7 @@ cultivos_selectos = {
                'Melón cantaloupe',
                'Plátano maduro',
                'Plátano verde'],
-    'Hortalizas': ['Papa blanca de primera',
+    'Hortaliza': ['Papa blanca de primera',
                    'Papa blanca de segunda',
                    'Tomate pera pintón',
                    'Tomate pera rojo'],
