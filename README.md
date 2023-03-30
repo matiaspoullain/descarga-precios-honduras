@@ -23,18 +23,18 @@ Last month PDF files are downloaded from **San Pedro Sula** and **Tegucigalpa** 
 6. Install requirements: `pip install requirements.txt`
 
 ## 3. Data description
-All files are stored in data[data] in one of these directories:
-- /pdfs[data/pdfs]: Raw PDF files are stored here. Subdirectories are created by the Year-Month (last month), region and zone.
-- /excels[data/excels]: Raw extraced tables from the PDFs are sotred here. The subdirectories structure is the same as for *data/pdfs*.
-- /processed_excels[data/processed_excels]: The raw excels are filtered and formatted. The output tables are stored here with the same subdirectories structures
+All files are stored in [data](data) in one of these directories:
+- [/pdfs](data/pdfs): Raw PDF files are stored here. Subdirectories are created by the Year-Month (last month), region and zone.
+- [/excels](data/excels): Raw extraced tables from the PDFs are sotred here. The subdirectories structure is the same as for *data/pdfs*.
+- [/processed_excels](data/processed_excels): The raw excels are filtered and formatted. The output tables are stored here with the same subdirectories structures
 
 ## 4. How to use
 ### 4.1. Download PDFs
 Running `python -m src.scrap` will download all last month available PDFs from SIMPAH webpage. If a PDF file is already downloaded, it's download will be omitted.
-Regions and zones that will be downloaded are specified in src/diccionario_reportes.py[src/diccionario_reportes.py].
+Regions and zones that will be downloaded are specified in [src/diccionario_reportes.py](src/diccionario_reportes.py).
 
 ### 4.2. Extract tables from downloaded PDFs
-Once all PDFs files are downloaded, running `python -m src.pdf_to_excel` will extract tables from the PDF files and store them as .xlsx files in data/excels[data/excels].
+Once all PDFs files are downloaded, running `python -m src.pdf_to_excel` will extract tables from the PDF files and store them as .xlsx files in [data/excels](data/excels).
 
 ### 4.3. Process extracted excel files
-Once all tables are extracted from the PDFs, running `python -m src.excel_to_processed_excels` will filter, format and store the tables as .xlsx files in data/processed_excels[data/processed_excels]
+Once all tables are extracted from the PDFs, running `python -m src.excel_to_processed_excels` will filter, format and store the tables as .xlsx files in [data/processed_excels](data/processed_excels)
