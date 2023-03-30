@@ -1,7 +1,6 @@
 from src.utils import *
 from src.diccionario_reportes import dict_reportes
 from tqdm import tqdm
-import urllib.parse
 
 print('Inicio de descarga de PDFs...')
 
@@ -10,7 +9,7 @@ current_year, current_month_number, current_month_nombre, joined_current_year_mo
 main_url = get_main_url(current_year)
 
 lista_urls = get_list_reportes_tipo_urls(dict_reportes, main_url, joined_current_year_month)
-lista_directorio_local = get_local_directory_path(dict_reportes)
+lista_directorio_local = get_local_directory_path(dict_reportes, current_month_number, current_year)
 
 dict_links_pdfs = {}
 for directory_path, single_url in zip(lista_directorio_local, lista_urls):

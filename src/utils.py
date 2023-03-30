@@ -1,6 +1,7 @@
 import requests
 import os
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from lxml import html
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
@@ -22,9 +23,11 @@ dict_calendario = {1: "Enero",
 
 
 
-def get_current_year_month():
-    current_year = datetime.now().year
-    current_month_numero = datetime.now().month
+def get_current_year_month(lag_months = -1):
+    date_now = datetime.now()
+    date_selected = date_now + relativedelta(months = lag_months)
+    current_year = date_selected.year
+    current_month_numero = date_selected.month
     current_month_nombre = dict_calendario[current_month_numero]
     joined_current_year_month = '%20'.join([str(current_month_numero).zfill(2), str(current_month_nombre), str(current_year)])
     return current_year, current_month_numero, current_month_nombre, joined_current_year_month
@@ -32,7 +35,7 @@ def get_current_year_month():
 def get_main_url(current_year):
     return f'http://historicos.simpah.hn/reportes_varios/index.php?dir=Reportes%20SIMPAH%20-%20{current_year}'
 
-def get_local_directory_path(dict_reportes, month = datetime.now().month, year = datetime.now().year):
+def get_local_directory_path(dict_reportes, month, year):
     lista_directorios = []
     fecha_lab = f'{year}-{str(month).zfill(2)}'
     for reporte in dict_reportes:
